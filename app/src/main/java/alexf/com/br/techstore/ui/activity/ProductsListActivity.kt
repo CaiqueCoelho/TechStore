@@ -1,9 +1,11 @@
 package alexf.com.br.techstore.ui.activity
 
 import alexf.com.br.techstore.AppDatabase
+import alexf.com.br.techstore.Database
 import alexf.com.br.techstore.R
 import alexf.com.br.techstore.dao.ProductDao
 import alexf.com.br.techstore.ui.activity.recyclerview.ProductsListAdapter
+import android.arch.lifecycle.Observer
 import android.arch.persistence.room.Room
 import android.content.Intent
 import android.os.Bundle
@@ -19,13 +21,13 @@ class ProductsListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_products_list)
 
-        val database = Room.databaseBuilder(
-                this,
-                AppDatabase::class.java,
-                "techstore-database")
-                .allowMainThreadQueries()
-                .build()
-        productDao = database.productDao()
+        val database = Database.instance(this)
+        val productsLiveData = productDao.all()
+
+        productsLiveData.observe(this, Observer { products ->
+            products?.let {
+                adapter.replaceAllProducts(it)
+            } })
 
         configureRecyclerView()
         configureFabAddProduct()
@@ -36,11 +38,6 @@ class ProductsListActivity : AppCompatActivity() {
             val openProductForm = Intent(this, FormProductActivity::class.java)
             startActivity(openProductForm)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        adapter.replaceAllProducts(productDao.all())
     }
 
     private fun configureRecyclerView() {

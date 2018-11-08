@@ -1,11 +1,9 @@
 package alexf.com.br.techstore.ui.activity
 
 import alexf.com.br.techstore.AppDatabase
-import alexf.com.br.techstore.Database
 import alexf.com.br.techstore.R
 import alexf.com.br.techstore.dao.ProductDao
 import alexf.com.br.techstore.model.Product
-import android.arch.persistence.room.Room
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_form_product.*
@@ -18,7 +16,7 @@ class FormProductActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_form_product)
 
-        val database = Database.instance(this)
+        val database = AppDatabase.getInstance(this)
         productDao = database.productDao()
 
         configureSaveButton()

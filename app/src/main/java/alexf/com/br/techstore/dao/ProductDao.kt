@@ -1,19 +1,21 @@
 package alexf.com.br.techstore.dao
 
 import alexf.com.br.techstore.model.Product
+import android.arch.persistence.room.Dao
+import android.arch.persistence.room.Insert
+import android.arch.persistence.room.Query
 
-class ProductDao {
+@Dao
+interface ProductDao {
 
     companion object {
         private val products: MutableList<Product> = mutableListOf()
     }
 
-    fun all (): List<Product> {
-        return products
-    }
+    @Query("SELECT * FROM product")
+    fun all (): List<Product>
 
-    fun add(vararg product: Product){
-        products.addAll(product)
-    }
+    @Insert
+    fun add(vararg product: Product)
 
 }

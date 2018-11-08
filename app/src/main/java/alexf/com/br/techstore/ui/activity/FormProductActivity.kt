@@ -7,7 +7,12 @@ import alexf.com.br.techstore.model.Product
 import android.arch.persistence.room.Room
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import kotlinx.android.synthetic.main.activity_form_product.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.io.IOException
 
 class FormProductActivity : AppCompatActivity() {
 
@@ -21,7 +26,6 @@ class FormProductActivity : AppCompatActivity() {
                 this,
                 AppDatabase::class.java,
                 "techstore-database")
-                .allowMainThreadQueries()
                 .build()
         productDao = database.productDao()
 
@@ -30,14 +34,20 @@ class FormProductActivity : AppCompatActivity() {
 
     private fun configureSaveButton() {
         form_product_save_button.setOnClickListener {
-            saveProduct()
+            runBlocking { saveProduct() }
             finish()
         }
     }
 
-    private fun saveProduct() {
-        val createdProduct = create()
-        productDao.add(createdProduct)
+    private suspend fun saveProduct() {
+        withContext(Dispatchers.IO){
+            try {
+                val createdProduct = create()
+                productDao.add(createdProduct)
+            }catch (e: IOException){
+                Log.e("SAVE", e.message)
+            }
+        }
     }
 
     private fun create(): Product {
